@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text To Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .main {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        h1 {
+            font-size: 6vw;
+            margin-bottom: 20px;
+        }
+        #image {
+            max-width: 100%;
+            display: none; 
+        }
+        .desc{
+            font-size: 1.5vw;
+            margin-bottom: 20px;
+        }
+        .loader {
+            margin-top: 50px;
+            border: 8px solid #f3f3f3; 
+            border-top: 8px solid #3498db; 
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <h1>Text to Image </h1>
+        <div>
+            <input class="desc" type="text" id="text" placeholder="Description">
+            <button class="desc" id="btn">Generate</button>
+        </div>
+        <div id="loading" class="loader" style="display:none;"></div>
+        <img id="image" src="" alt="">
+    </div>
+    <script>
+        const input = document.getElementById("text");
+        const image = document.getElementById("image");
+        const btn = document.getElementById("btn");
+        const loading = document.getElementById("loading");
+
+        async function query() {
+            loading.style.display = "block";
+
+            const response = await fetch(
+                "https://api-inference.huggingface.co/models/Melonie/text_to_image_finetuned",
+                {
+                    headers: { Authorization: "Bearer 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" },
+                    method: "POST",
+                    body: JSON.stringify({ "inputs": input.value }),
+                }
+            );
+            const result = await response .blob();
+        
+            loading.style.display = "none";
+            
+            return result;
+        }
+
+        btn.addEventListener("click", async function() {
+            try {
+                const imageData = await query();
+                image.style.display = "block"; 
+                image.src = URL.createObjectURL(imageData);
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        });
+    </script>
+</body>
+</html>
